@@ -1,0 +1,82 @@
+---
+layout: page
+title: Pixel-wise RL on Diffusion Models
+permalink: /
+---
+
+
+
+<div style="text-align: center;">
+    <p><strong>Mo Kordzanganeh</strong>, <strong>Danial Keshvary</strong>, and <strong>Nariman Arian</strong><br>
+    Solofied Limited</p>
+</div>
+
+<div style="text-align: center;">
+    <a href="/papers/your-paper.pdf" class="button">arXiv</a> | <a href="http://solofied.com" class="button">solofied.com</a>
+</div>
+
+<h1>Abstract</h1>
+<div style="text-align: justify;">
+Latent diffusion models are the state-of-the-art for synthetic image generation.  To align these models with human preferences, training the models using reinforcement learning on human feedback is crucial.   Black et. al 2024 [1] introduced denoising diffusion policy optimisation (DDPO), which accounts for the iterative denoising nature of the generation by modelling it as a Markov chain with a final reward. As the reward is a single value that determines the model's performance on the entire image, the model has to navigate a very sparse reward landscape and so requires a large sample count.  In this work, we extend the DDPO by presenting the <strong>Pixel-wise Policy Optimisation (PXPO)</strong> algorithm, which can take feedback for each pixel, providing a more nuanced reward to the model. 
+</div>
+
+<img src="{{ site.baseurl }}/assets/images/pipeline.jpg" alt="PXPO Pipeline" style="width: 100%;"/>
+<div style="height: 15px;"></div>
+
+<h2>Results</h2>
+
+<p>We performed three sets of experiments to determine how well PXPO works:</p>
+<ol>
+    <li>Preference-based manual human feedback on a single image</li>
+    <li>Segmentation feedback from an AI model</li>
+    <li>Colour-channel feedback</li>
+</ol>
+<div style="height: 15px;"></div>
+
+<div style="text-align: justify;">
+<h3>Experiment 1: Pixel-wise Human Feedback</h3>
+
+In this experiment, Stable Diffusion v1.4 [2] was prompted to generate a <em>nature landscape</em>.  Then a human subject was asked to fill in the areas they liked with the colour green (corresponding to a feedback of +2 for each pixel filled) and areas they disliked with red (which was -2). The user decided that they liked the lake and disliked the trees, and filled up the first image accordingly.  The model was updated using PXPO based on this single-image feedback, and the process was repeated 15 times, and with each iteration the model improved itself.  At the end of this process, the resultant image had significantly more water and fewer trees. The experiment was repeated from scratch, this time the user provided the opposite feedback. This was to ensure the model actually followed instructions. The result, similarly was a significant adaptation of the image to the user's preferences. 
+<div style="height: 15px;"></div>
+<img src="{{ site.baseurl }}/assets/images/RLHF.jpg" alt="pixel-wise human feedback" style="width: 100%;"/>
+
+<div style="display: flex; justify-content: space-around; align-items: center;">
+    <img src="{{ site.baseurl }}/assets/gif/RLHF_gif_lake.gif" alt="RLHF Animation - Trees Decrease Lake Increases" style="width: 48%;"/>
+    <img src="{{ site.baseurl }}/assets/gif/RLHF_gif_trees.gif" alt="RLHF Animation - Trees Increase Lake Decreases" style="width: 48%;"/>
+</div>
+</div>
+
+<!-- Add some vertical space -->
+<div style="height: 50px;"></div>   
+
+<!-- Add a horizontal line -->
+<hr style="border-top: 1px solid #ccc; margin-top: 20px; margin-bottom: 20px;"/>
+
+<div style="display: flex; justify-content: space-between;">
+  <div style="flex: 1; padding-right: 15px;text-align: justify;">
+    <h4>Experiment 2: Segmentation Feedback</h4>
+
+    The human user was replaced with an AI segmentation model (SegFormer clothes [3]) that could detect various categories of human clothes and body parts.  The synthesier was prompted to generate <em>portrait of a man on the beach</em>.  The SegFormer had to find the person's hair and provide negative feedback in the areas where hair existed.  After 160 reward queries, the synthesiser had learned to reduce the possibility of any hair being detected by the SegFormer.
+    <div style="height: 15px;"></div>  
+  <img src="{{ site.baseurl }}/assets/images/segmentation.jpg" alt="Segmentation Experiment" style="width: 100%;"/>
+
+  </div>
+
+  <div style="flex: 1; padding-left: 15px;text-align: justify;">
+    <h4>Experiment 3: Colour-channel Feedback</h4>
+    <p>This time, the aim was provide an algorithmic feedback.  The model was prompted to generate a <em>red taxi in traffic</em>, and as feedback, each pixel with the colour blue in it was penalised proportionally to the amount of blue present in the image.  The model managed to dramatically reduce the colour blue from the images after 1024 reward queries. 
+    </p>
+    <img src="{{ site.baseurl }}/assets/images/colour_channel.jpg" alt="Colour-channel experiment" style="width: 100%;"/>
+  </div>
+</div>
+
+
+<!-- Add some vertical space -->
+<div style="height: 50px;"></div>
+
+
+<h2>References</h2>
+<hr style="border-top: 1px solid #ccc; margin-top: 20px; margin-bottom: 20px;"/>
+<p>[1] K. Black, M. Janner, Y. Du, I. Kostrikov, and S. Levine, "Training diffusion models with reinforcement learning" (2024), arXiv:2305.13301 [cs.LG].</p>
+<p>[2] R. Rombach, A. Blattmann, D. Lorenz, P. Esser, and B. Ommer, "High-resolution image synthesis with latent diffusion models," in Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) (2022) pp. 10684–10695.</p>
+<p>[3] M. Dziemian, "mattmdjaga/segformer b2 clothes - hugging face," <a href="https://huggingface.co/mattmdjaga/segformer_b2_clothes">https://huggingface.co/mattmdjaga/segformer_b2_clothes</a> (2023).</p>
